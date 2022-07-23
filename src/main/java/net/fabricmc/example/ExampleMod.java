@@ -1,6 +1,17 @@
 package net.fabricmc.example;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.network.message.MessageType;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import static net.minecraft.server.command.CommandManager.literal;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,12 +21,29 @@ public class ExampleMod implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger("worldplexer");
 
+	public static final Item CUSTOM_ITEM = new Item(new FabricItemSettings().group(ItemGroup.MISC));
+
 	@Override
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
+
+		// Register an item
 		LOGGER.info("Hello Fabric world, this is Worldplexer!");
+		Registry.register(Registry.ITEM, new Identifier("worldplexer", "custom_item"), CUSTOM_ITEM);
+
+		// Register a command
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            dispatcher.register(literal("foo").executes(context -> {
+				final Text text = Text.literal("Hello, Worldplexer!")
+					.formatted(Formatting.ITALIC)
+					.formatted(Formatting.LIGHT_PURPLE);
+				context.getSource().getServer().getPlayerManager().broadcast(text, MessageType.SYSTEM);
+				context.getSource().getPlayer().kill();
+                return 1;
+            }));
+        });
 	}
 }
