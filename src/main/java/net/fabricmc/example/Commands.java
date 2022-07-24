@@ -3,16 +3,21 @@ package net.fabricmc.example;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import net.fabricmc.fabric.impl.dimension.FabricDimensionInternals;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.TeleportTarget;
 import xyz.nucleoid.fantasy.Fantasy;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 
@@ -72,6 +77,8 @@ public class Commands {
             .setSeed(1234)
         );
 
+        // server.
+
         return 1;
     }
 
@@ -89,6 +96,23 @@ public class Commands {
     }
 
     private static int commandTp(CommandContext<ServerCommandSource> context) {
+        final ServerCommandSource source = context.getSource();
+        final MinecraftServer server = source.getServer();
+
+        final ServerPlayerEntity player = source.getPlayer();
+        ServerWorld dimension;
+        try {
+            dimension = DimensionArgumentType.getDimensionArgument(context, ARG_WORLD);
+
+            final TeleportTarget target = new TeleportTarget(
+                player.getPos(), player.getVelocity(), player.getYaw(), player.getPitch());
+            FabricDimensionInternals.changeDimension(player, dimension, target);
+        } catch (CommandSyntaxException e) {
+            broadcastError(server, "Dimension does not exist");
+            // e.printStackTrace();
+            return -1;
+        }
+
         return 1;
     }
 
