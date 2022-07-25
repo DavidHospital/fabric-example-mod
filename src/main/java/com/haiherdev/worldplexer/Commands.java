@@ -1,4 +1,4 @@
-package net.fabricmc.example;
+package com.haiherdev.worldplexer;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;

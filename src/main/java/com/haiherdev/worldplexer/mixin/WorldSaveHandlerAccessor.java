@@ -1,4 +1,4 @@
-package net.fabricmc.example.mixin;
+package com.haiherdev.worldplexer.mixin;
 
 import java.io.File;
 
