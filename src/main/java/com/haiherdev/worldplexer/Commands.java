@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.logging.LogUtils;
 
 import net.fabricmc.fabric.impl.dimension.FabricDimensionInternals;
 import net.minecraft.command.argument.DimensionArgumentType;
@@ -24,10 +25,13 @@ import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
 public class Commands {
+
+    private static final Logger logger = LogUtils.getLogger();
 
     public static String CMD_PREFIX = "plex";
     public static String CMD_CREATE = "create";
@@ -37,6 +41,7 @@ public class Commands {
     public static String ARG_WORLD = "world";
 
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
+        logger.info("Registering commands");
         dispatcher.register(literal(CMD_PREFIX).executes(Commands::commandHelp)
             .then(literal(CMD_CREATE)
                 .then(argument(ARG_WORLD, StringArgumentType.greedyString())
