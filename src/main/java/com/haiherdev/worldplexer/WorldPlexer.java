@@ -14,7 +14,6 @@ public class WorldPlexer implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger("worldplexer");
 
-	private MinecraftServer server;
 	private PlexSaveHandler plexSaveHandler;
 
 	@Override
@@ -36,8 +35,7 @@ public class WorldPlexer implements ModInitializer {
 	}
 
 	private void onServerStarting(MinecraftServer server) {
-		this.server = server;
-		this.plexSaveHandler = new PlexSaveHandler(server);
-		this.plexSaveHandler.loadWorlds();
+		this.plexSaveHandler = PlexSaveHandler.get(server);
+		this.plexSaveHandler.loadWorldsToRegistry();
 	}
 }

@@ -80,9 +80,7 @@ public class Commands {
             .setGenerator(server.getOverworld().getChunkManager().getChunkGenerator())
             .setDimensionType(RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier("overworld")))
             .setSeed(1234)
-        );
-
-        // server.
+        ).asWorld();
 
         return 1;
     }
