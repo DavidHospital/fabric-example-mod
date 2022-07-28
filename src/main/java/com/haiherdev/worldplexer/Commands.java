@@ -1,5 +1,6 @@
 package com.haiherdev.worldplexer;
 
+import com.haiherdev.worldplexer.mixin.PlayerManagerMixin;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -106,10 +107,16 @@ public class Commands {
         ServerWorld dimension;
         try {
             dimension = DimensionArgumentType.getDimensionArgument(context, ARG_WORLD);
+            if (player.getWorld().getRegistryKey().getValue().equals(dimension.getRegistryKey().getValue())) {
+                broadcastError(server, String.format("You are already in dimension [%s]", dimension.getRegistryKey().getValue().toString()));
+                return 0;
+            }
 
+            ((PlayerManagerMixin) server.getPlayerManager()).invokeSavePlayerData(player);
             final TeleportTarget target = new TeleportTarget(
                 player.getPos(), player.getVelocity(), player.getYaw(), player.getPitch());
             FabricDimensionInternals.changeDimension(player, dimension, target);
+            server.getPlayerManager().loadPlayerData(player);
         } catch (CommandSyntaxException e) {
             broadcastError(server, "Dimension does not exist");
             // e.printStackTrace();
